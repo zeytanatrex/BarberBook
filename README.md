@@ -177,8 +177,6 @@ EMAIL_PASS=contraseña_app
 
 ## 📷 Capturas
 
-Se recomienda agregar capturas de:
-
 - Inicio
   <img width="774" height="502" alt="image" src="https://github.com/user-attachments/assets/e0f0aac3-baba-40ab-94c2-051ed3fbeae5" />
   <img width="819" height="553" alt="image" src="https://github.com/user-attachments/assets/7ab16c75-27f9-4491-b3fd-50c69e31921a" />
