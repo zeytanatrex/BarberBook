@@ -1,65 +1,75 @@
-  // Importa la configuración de Nodemailer para enviar correos de verificación
-  const transporter = require("../utils/email");
-  const db = require("../config/db");
-  const BACKEND_URL =
-    process.env.BACKEND_URL || "http://localhost:3000";
+const transporter = require("../utils/email");
+const db = require("../config/db");
 
-  exports.registrar = (req, res) => {
-    const { nombre, correo, password } = req.body;
+const BACKEND_URL =
+  process.env.BACKEND_URL || "http://localhost:3000";
 
-    // Genera un código aleatorio de 6 dígitos para verificar el correo
-    const codigo = Math.floor(100000 + Math.random() * 900000);
+exports.registrar = (req, res) => {
+  const { nombre, correo, password } = req.body;
 
-    // Convierte el código a texto para guardarlo y enviarlo por correo
-    const codigoTexto = codigo.toString();
+  const codigo = Math.floor(100000 + Math.random() * 900000);
+  const codigoTexto = codigo.toString();
 
-    // Guarda el usuario junto con su código de verificación
-    const sql = `
-      INSERT INTO usuarios(nombre, correo, password, codigo_verificacion)
-      VALUES (?, ?, ?, ?)
-    `;
-    db.query(
-      sql,
-      [nombre, correo, password, codigoTexto],
-      (error, result) => {
-        if (error) {
-          return res.status(500).json(error);
-        }
-    const enlace = `${BACKEND_URL}/api/usuarios/verificar/${codigoTexto}`;
-          transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: correo,
-            subject: "Verifica tu cuenta BarberBook",
-            html: `
-              <h2>Bienvenido a BarberBook</h2>
+  const sql = `
+    INSERT INTO usuarios(nombre, correo, password, codigo_verificacion)
+    VALUES (?, ?, ?, ?)
+  `;
 
-              <p>Haz clic en el botón para verificar tu cuenta.</p>
+  db.query(
+    sql,
+    [nombre, correo, password, codigoTexto],
+    async (error, result) => {
+      if (error) {
+        console.error("ERROR MYSQL REGISTRO:", error);
 
-              <a href="${enlace}"
-                style="
+        return res.status(500).json({
+          mensaje: "No se pudo registrar el usuario",
+          error: error.code,
+        });
+      }
+
+      const enlace =
+        `${BACKEND_URL}/api/usuarios/verificar/${codigoTexto}`;
+
+      try {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: correo,
+          subject: "Verifica tu cuenta BarberBook",
+          html: `
+            <h2>Bienvenido a BarberBook</h2>
+            <p>Haz clic en el botón para verificar tu cuenta.</p>
+
+            <a href="${enlace}"
+              style="
                 background:#d4af37;
                 color:white;
                 padding:12px 20px;
                 text-decoration:none;
-                border-radius:5px;">
-                Verificar cuenta
-              </a>
-            `,
-          })
-        .then(() => {
-          console.log("Correo enviado correctamente");
-        })
-        .catch((error) => {
-          console.error("ERROR NODEMAILER:", error);
+                border-radius:5px;
+              ">
+              Verificar cuenta
+            </a>
+          `,
         });
-        res.json({
+
+        console.log("Correo enviado correctamente");
+
+        return res.json({
           mensaje: "Usuario creado. Revisa tu correo para verificar tu cuenta.",
           id: result.insertId,
         });
+      } catch (errorCorreo) {
+        console.error("ERROR NODEMAILER:", errorCorreo);
 
+        return res.status(500).json({
+          mensaje: "El usuario fue registrado, pero no se pudo enviar el correo",
+          error: errorCorreo.code,
+        });
       }
-    );
-  };
+    }
+  );
+};
 
 exports.login = (req, res) => {
   const { correo, password } = req.body;
@@ -71,11 +81,7 @@ exports.login = (req, res) => {
     AND password = ?
   `;
 
-    db.query(sql, [correo, password], (error, result) => {
-
-    console.log("RESULTADO LOGIN:");
-    console.log(result);
-
+  db.query(sql, [correo, password], (error, result) => {
     if (error) {
       return res.status(500).json(error);
     }
@@ -98,6 +104,7 @@ exports.login = (req, res) => {
     });
   });
 };
+
 exports.verificarCorreo = (req, res) => {
   const { codigo } = req.params;
 
@@ -132,9 +139,13 @@ exports.reenviarVerificacion = (req, res) => {
     WHERE correo = ?
   `;
 
-  db.query(sql, [correo], (error, result) => {
+  db.query(sql, [correo], async (error, result) => {
     if (error) {
-      return res.status(500).json(error);
+      console.error("ERROR MYSQL REENVÍO:", error);
+
+      return res.status(500).json({
+        mensaje: "No se pudo buscar el usuario",
+      });
     }
 
     if (result.length === 0) {
@@ -144,33 +155,41 @@ exports.reenviarVerificacion = (req, res) => {
     }
 
     const codigo = result[0].codigo_verificacion;
-
     const enlace =
-    `${BACKEND_URL}/api/usuarios/verificar/${codigo}`;
+      `${BACKEND_URL}/api/usuarios/verificar/${codigo}`;
 
-    transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: correo,
-      subject: "Verifica tu cuenta BarberBook",
-      html: `
-        <h2>Bienvenido a BarberBook</h2>
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: correo,
+        subject: "Verifica tu cuenta BarberBook",
+        html: `
+          <h2>Bienvenido a BarberBook</h2>
+          <p>Haz clic en el botón para verificar tu cuenta.</p>
 
-        <p>Haz clic en el botón para verificar tu cuenta.</p>
+          <a href="${enlace}"
+            style="
+              background:#d4af37;
+              color:white;
+              padding:12px 20px;
+              text-decoration:none;
+              border-radius:5px;
+            ">
+            Verificar cuenta
+          </a>
+        `,
+      });
 
-        <a href="${enlace}"
-        style="
-        background:#d4af37;
-        color:white;
-        padding:12px 20px;
-        text-decoration:none;
-        border-radius:5px;">
-        Verificar cuenta
-        </a>
-      `,
-    });
+      return res.json({
+        mensaje: "Correo reenviado correctamente",
+      });
+    } catch (errorCorreo) {
+      console.error("ERROR NODEMAILER REENVÍO:", errorCorreo);
 
-    res.json({
-      mensaje: "Correo reenviado correctamente",
-    });
+      return res.status(500).json({
+        mensaje: "No se pudo reenviar el correo",
+        error: errorCorreo.code,
+      });
+    }
   });
 };

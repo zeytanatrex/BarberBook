@@ -8,9 +8,6 @@ const barberoRoutes =
 require("./routes/barberoRoutes");
 require("dotenv").config();
 
-console.log("USER=", process.env.EMAIL_USER);
-console.log("PASS=", process.env.EMAIL_PASS);
-
 const db = require("./config/db");
 const transporter = require("./utils/email");
 
