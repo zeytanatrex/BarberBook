@@ -55,7 +55,7 @@ function PanelBarbero() {
 
     const intervalo = setInterval(() => {
       cargarReservas(barberoSeleccionado);
-    }, 1000);
+    }, 30000);
 
     return () => clearInterval(intervalo);
   }, [barberoSeleccionado, fechaSeleccionada]);
@@ -134,7 +134,6 @@ function PanelBarbero() {
         value={fechaSeleccionada}
         onChange={(e) => {
           setFechaSeleccionada(e.target.value);
-          if (barberoSeleccionado) cargarReservas(barberoSeleccionado);
         }}
         style={{
           background: "#111",

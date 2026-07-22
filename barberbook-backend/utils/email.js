@@ -1,28 +1,13 @@
 require("dotenv").config();
 
-const brevo = require("@getbrevo/brevo");
+const nodemailer = require("nodemailer");
 
-const client = new brevo.BrevoClient({
-  apiKey: process.env.BREVO_API_KEY,
-});
-
-const transporter = {
-  sendMail: async ({ to, subject, html, text }) => {
-    const destinatario =
-      typeof to === "string"
-        ? [{ email: to }]
-        : to.map((email) => ({ email }));
-
-    return client.transactionalEmails.sendTransacEmail({
-      sender: {
-        name: "BarberBook",
-        email: "barberbookproyecto@gmail.com",
-      },
-      to: destinatario,
-      subject,
-      htmlContent: html || `<p>${text || ""}</p>`,
-    });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
-};
+});
 
 module.exports = transporter;
