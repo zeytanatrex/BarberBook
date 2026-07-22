@@ -143,7 +143,7 @@ exports.eliminarReserva = (req, res) => {
   barberos.correo AS correoBarbero,
   CONCAT(barberos.nombre, ' ', barberos.apellidos) AS nombreBarbero
   FROM reservas
-  NNER JOIN usuarios 
+  INNER JOIN usuarios 
   ON reservas.usuario_id = usuarios.id
   LEFT JOIN barberos 
   ON reservas.barbero = CONCAT(barberos.nombre, ' ', barberos.apellidos)
