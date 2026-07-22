@@ -1,23 +1,27 @@
 require("dotenv").config();
 
-const { Resend } = require("resend");
+const brevo = require("@getbrevo/brevo");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const client = new brevo.BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
+});
 
 const transporter = {
   sendMail: async ({ to, subject, html, text }) => {
-    const { data, error } = await resend.emails.send({
-      from: "BarberBook <onboarding@resend.dev>",
-      to,
+    const destinatario =
+      typeof to === "string"
+        ? [{ email: to }]
+        : to.map((email) => ({ email }));
+
+    return client.transactionalEmails.sendTransacEmail({
+      sender: {
+        name: "BarberBook",
+        email: "barberbookproyecto@gmail.com",
+      },
+      to: destinatario,
       subject,
-      html: html || `<p>${text}</p>`,
+      htmlContent: html || `<p>${text || ""}</p>`,
     });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
   },
 };
 
