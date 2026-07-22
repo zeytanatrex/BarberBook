@@ -13,7 +13,7 @@ function MisReservas() {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
     axios
-      .get(`http://localhost:3000/api/reservas/${usuario.id}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/reservas/${usuario.id}`)
       .then((res) => setReservas(res.data));
   }, []);
 
@@ -87,9 +87,12 @@ const cancelarReserva = async (id) => {
   if (!confirmar) return;
 
   try {
-    await axios.put(`http://localhost:3000/api/reservas/${id}/estado`, {
-      estado: "Cancelada",
-    });
+    await axios.put(
+      `${import.meta.env.VITE_API_URL}/api/reservas/${id}/estado`,
+      {
+        estado: "Cancelada",
+      }
+    );
 
     setReservas(
       reservas.map((r) =>

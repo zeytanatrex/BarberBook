@@ -46,9 +46,13 @@ return(
     }
 
     try {
-      const respuesta = await axios.post("http://localhost:3000/api/usuarios/login", {
-      correo,
-      password,});
+      const respuesta = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/usuarios/login`,
+        {
+          correo,
+          password,
+        }
+      );
       localStorage.setItem("usuario", JSON.stringify(respuesta.data.usuario));
 
       alert("✅ Login correcto");
@@ -85,7 +89,7 @@ onClick={async () => {
 
   try {
     await axios.post(
-      "http://localhost:3000/api/usuarios/reenviar-verificacion",
+      `${import.meta.env.VITE_API_URL}/api/usuarios/reenviar-verificacion`,
       { correo }
     );
 

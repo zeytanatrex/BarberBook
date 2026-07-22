@@ -19,7 +19,7 @@ useEffect(() => {
 
 useEffect(() => {
   axios
-    .get("http://localhost:3000/api/barberos")
+    .get(`${import.meta.env.VITE_API_URL}/api/barberos`)
     .then((res) => {
       setBarberos(res.data);
     });
@@ -27,7 +27,7 @@ useEffect(() => {
 useEffect(() => {
   if (fechaSeleccionada && barberoSeleccionado) {
     axios
-      .get("http://localhost:3000/api/reservas/ocupadas", {
+      .get(`${import.meta.env.VITE_API_URL}/api/reservas/ocupadas`, {
         params: {
           fecha: fechaSeleccionada,
           barbero: barberoSeleccionado,
@@ -237,16 +237,15 @@ return (
     }
       try {
       const usuario = JSON.parse(localStorage.getItem("usuario"));
-      const respuesta = await axios.post(
-    "http://localhost:3000/api/reservas",
+    const respuesta = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/reservas`,
     {
       servicio,
       barbero,
       fecha,
       hora,
 
-      usuario_id:
-      usuario.id
+      usuario_id: usuario.id
 }
 );
 

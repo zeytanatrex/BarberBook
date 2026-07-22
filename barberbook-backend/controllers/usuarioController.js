@@ -1,6 +1,8 @@
   // Importa la configuración de Nodemailer para enviar correos de verificación
   const transporter = require("../utils/email");
   const db = require("../config/db");
+  const BACKEND_URL =
+    process.env.BACKEND_URL || "http://localhost:3000";
 
   exports.registrar = (req, res) => {
     const { nombre, correo, password } = req.body;
@@ -23,8 +25,7 @@
         if (error) {
           return res.status(500).json(error);
         }
-          const enlace = `http://localhost:3000/api/usuarios/verificar/${codigoTexto}`;
-
+    const enlace = `${BACKEND_URL}/api/usuarios/verificar/${codigoTexto}`;
           transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: correo,
@@ -145,7 +146,7 @@ exports.reenviarVerificacion = (req, res) => {
     const codigo = result[0].codigo_verificacion;
 
     const enlace =
-      `http://localhost:3000/api/usuarios/verificar/${codigo}`;
+    `${BACKEND_URL}/api/usuarios/verificar/${codigo}`;
 
     transporter.sendMail({
       from: process.env.EMAIL_USER,

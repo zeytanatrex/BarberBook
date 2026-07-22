@@ -18,10 +18,13 @@ function LoginBarbero() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:3000/api/barberos/login", {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/barberos/login`,
+      {
         correo,
         password,
-      });
+      }
+    );
 
       localStorage.setItem("barbero", JSON.stringify(res.data.barbero));
       navigate("/panel-barbero");

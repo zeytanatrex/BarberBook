@@ -82,14 +82,14 @@ style={{
             return;
           }
             try {
-      await axios.post(
-        "http://localhost:3000/api/usuarios/registro",
-        {
-          nombre,
-          correo,
-          password,
-        }
-      );
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/usuarios/registro`,
+          {
+            nombre,
+            correo,
+            password,
+          }
+        );
           alert("✅ Usuario registrado. Revisa tu correo para verificar tu cuenta.");
           navigate("/login");
 

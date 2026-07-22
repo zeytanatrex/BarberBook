@@ -43,8 +43,9 @@ function PanelBarbero() {
 
   useEffect(() => {
     document.title = "BarberBook | Panel Barbero";
-
-    axios.get("http://localhost:3000/api/barberos").then((res) => {
+  axios
+    .get(`${import.meta.env.VITE_API_URL}/api/barberos`)
+    .then((res) => {
       setBarberos(res.data.filter((b) => b.disponible));
     });
   }, []);
@@ -70,9 +71,9 @@ function PanelBarbero() {
     setCargando(true);
 
     try {
-      const res = await axios.get(
-        `http://localhost:3000/api/reservas/barbero/${idBarbero}?fecha=${fechaSeleccionada}`
-      );
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/reservas/barbero/${idBarbero}?fecha=${fechaSeleccionada}`
+    );
 
       const reservasOrdenadas = res.data.sort((a, b) => {
         if (a.estado === "Confirmada" && b.estado !== "Confirmada") return -1;

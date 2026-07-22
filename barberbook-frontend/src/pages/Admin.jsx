@@ -4,19 +4,17 @@ import axios from "axios";
 import "../styles/Home.css";
 
 function Admin() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-
   const [autorizado, setAutorizado] = useState(false);
   const [reservas, setReservas] = useState([]);
   const [barberos, setBarberos] = useState([]);
-
   const [nombre, setNombre] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFin, setHoraFin] = useState("");
   const [disponible, setDisponible] = useState(true);
   const [editandoId, setEditandoId] = useState(null);
-
   const [filtroBarbero, setFiltroBarbero] = useState("");
   const [filtroFecha, setFiltroFecha] = useState(
     new Date().toLocaleDateString("en-CA")
@@ -42,20 +40,20 @@ function Admin() {
     document.title = "BarberBook | Admin";
     cargarReservas();
 
-    axios.get("http://localhost:3000/api/barberos").then((res) => {
+    axios.get(`${API_URL}/api/barberos`).then((res) => {
       setBarberos(res.data);
     });
   }, [autorizado]);
 
   const cargarReservas = () => {
-    axios.get("http://localhost:3000/api/reservas/admin/todas").then((res) => {
+     axios.get(`${API_URL}/api/reservas/admin/todas`).then((res) => {
       setReservas(res.data);
     });
   };
 
   const cambiarEstado = async (id, nuevoEstado) => {
     try {
-      await axios.put(`http://localhost:3000/api/reservas/${id}/estado`, {
+      await axios.put(`${API_URL}/api/reservas/${id}/estado`, {
         estado: nuevoEstado,
       });
 
@@ -95,7 +93,7 @@ function Admin() {
 
     try {
       await axios.put(
-        `http://localhost:3000/api/barberos/${editandoId}`,
+        `${API_URL}/api/barberos/${editandoId}`,
         {
           nombre,
           apellidos,
@@ -105,7 +103,7 @@ function Admin() {
         }
       );
 
-      const res = await axios.get("http://localhost:3000/api/barberos");
+      const res = await axios.get(`${API_URL}/api/barberos`);
       setBarberos(res.data);
 
       setNombre("");
