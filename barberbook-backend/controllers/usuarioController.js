@@ -20,11 +20,12 @@ exports.registrar = (req, res) => {
     [nombre, correo, password, codigoTexto],
     async (error, result) => {
       if (error) {
-        console.error("ERROR MYSQL REGISTRO:", error);
+        console.error("ERROR MYSQL REGISTRO:", error.sqlMessage);
 
         return res.status(500).json({
           mensaje: "No se pudo registrar el usuario",
           error: error.code,
+          detalle: error.sqlMessage,
         });
       }
 
